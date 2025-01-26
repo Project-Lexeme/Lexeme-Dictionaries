@@ -39,17 +39,20 @@ def standardize_wiktionary_dictionary(filepath: str, lang_code: str, aggregate_d
 
 def standardize_korean_dictionary(filepath: str) -> None: # TODO: find better korean dictionary
     '''
-     화학 반응 	 chemical reaction ; reaction 	 chemistry 
-     신비한 (sin-bi-han) 	 cryptic ; cryptical ; deep ; inscrutable ; mysterious ; mystifying 	 descriptive_adjectives 
+    id	surface	hanja	gloss	level	created	source
+    36653	등친의		removed		2006-01-16T09:52:46Z	engdic-151556@ezcorean:151556
+    36654	등퇴장	登退場			2009-01-01T20:23:14Z	mr.hanja-215801@ezcorean:215801
      '''
     
     entries = []
-    re_string = r' ([\S; \-]*) ?\t ?([\S; \-]*) ?\t ?([\S_ ]*)'
+    re_string = r'([\S; \-]*)?\t?([\S; \-]*)?\t?([\S_ ]*)?\t?([\S_ ]*)?\t?([\S_ ]*)?\t?([\S_ ]*)?\t?([\S_ ]*)\n'
     with open(filepath,'r', encoding='utf-8') as f:
         for line in f:
+            if line.startswith('id'):
+                continue
             if re.match(re_string, line):
-                term, definition, notes = re.match(re_string, line).groups() # type: ignore
-                entries.append([term, definition, notes])
+                _, term, hanja, definition, _, _, _  = re.match(re_string, line).groups() # type: ignore
+                entries.append([term, definition, hanja])
 
     korean_lang_code = 'kor'
     # lang_dict_save_filepath = f"{config.get_data_directory()}\\dictionaries\\{korean_lang_code}_dictionary.csv" # have to switch hyphen for underscore
@@ -182,8 +185,9 @@ def standardize_indonesian_dict(filepath):
     df.to_csv('standardized_dictionaries/ind_dictionary.csv', index=False)    
     
 if __name__ == '__main__':
-    standardize_indonesian_dict('source_dictionaries/indonesian_dictionary.txt')
-    # standardize_korean_dictionary(filepath)
+    # standardize_indonesian_dict('source_dictionaries/indonesian_dictionary.txt')
+    filepath = 'source_dictionaries/kengdic.tsv'
+    standardize_korean_dictionary(filepath)
     # langs = ['de-en', 'es-en', 'fr-en', 'ru-en']
     # for i, lang in enumerate(langs):
     #     dict_filepath = f'{config.get_data_directory()}\\dictionaries\\{lang}-enwiktionary.txt'
